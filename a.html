@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics Quiz (50 Questions)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .section-title {
+            margin-top: 30px;
+            padding: 10px;
+            color: white;
+            border-radius: 4px;
+        }
+        .mean-sec { background-color: #27ae60; }
+        .median-sec { background-color: #2980b9; }
+        .mode-sec { background-color: #f39c12; }
+        .sd-sec { background-color: #c0392b; }
+        
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question p {
+            font-weight: bold;
+            margin-top: 0;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        label {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+        }
+        label:hover {
+            background: #f0f0f0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        button:hover {
+            background: #34495e;
+        }
+        #result {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        /* Highlight correct style */
+        .correct-highlight {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>📊 Statistics Poll Quiz</h1>
+    <form id="quizForm">
+        
+        <!-- MEAN POLLS -->
+        <div class="section-title mean-sec">🟢 MEAN POLLS (1–15)</div>
+        <div id="mean-questions"></div>
+
+        <!-- MEDIAN POLLS -->
+        <div class="section-title median-sec">🔵 MEDIAN POLLS (16–25)</div>
+        <div id="median-questions"></div>
+
+        <!-- MODE POLLS -->
+        <div class="section-title mode-sec">🟡 MODE POLLS (26–35)</div>
+        <div id="mode-questions"></div>
+
+        <!-- VARIANCE & SD POLLS -->
+        <div class="section-title sd-sec">🔴 VARIANCE & SD POLLS (36–50)</div>
+        <div id="sd-questions"></div>
+
+        <button type="button" onclick="checkAnswers()">Submit Quiz</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+const quizData = [
+    // Mean Polls
+    { q: "1. Mean of 2, 4, 6, 8?", opts: ["4", "5", "6", "8"], ans: 1 },
+    { q: "2. Mean of 10, 20, 30?", opts: ["15", "20", "25", "30"], ans: 1 },
+    { q: "3. Mean of 5 numbers is 12. Sum?", opts: ["50", "55", "60", "65"], ans: 2 },
+    { q: "4. Mean of 3,3,3,3?", opts: ["0", "3", "6", "12"], ans: 1 },
+    { q: "5. Mean of first 5 natural numbers?", opts: ["2", "3", "4", "5"], ans: 1 },
+    { q: "6. Mean of 1,2,3,4,10?", opts: ["3", "4", "5", "6"], ans: 1 },
+    { q: "7. Mean × number = ?", opts: ["Median", "Mode", "Sum", "Range"], ans: 2 },
+    { q: "8. Mean of 7,9,11?", opts: ["8", "9", "10", "11"], ans: 1 },
+    { q: "9. Mean of 0,0,0,0?", opts: ["0", "1", "Undefined", "4"], ans: 0 },
+    { q: "10. Mean=10 for 4 numbers → total?", opts: ["20", "30", "40", "50"], ans: 2 },
+    { q: "11. Mean of 6,8,10,12?", opts: ["8", "9", "10", "11"], ans: 1 },
+    { q: "12. Mean increases when?", opts: ["Add small value", "Add large value", "Remove value", "No change"], ans: 1 },
+    { q: "13. Mean of 2,4,6,x is 5 → x?", opts: ["6", "8", "10", "12"], ans: 1 },
+    { q: "14. Mean of 1–9?", opts: ["4", "5", "6", "7"], ans: 1 },
+    { q: "15. Mean of identical values?", opts: ["0", "Same value", "Undefined", "Largest"], ans: 1 },
+    
+    // Median Polls
+    { q: "16. Median of 1,3,5?", opts: ["1", "3", "5", "9"], ans: 1 },
+    { q: "17. Median of 2,4,6,8?", opts: ["4", "5", "6", "7"], ans: 1 },
+    { q: "18. First step to find median?", opts: ["Add", "Arrange", "Multiply", "Divide"], ans: 1 },
+    { q: "19. Median of 7,3,9,1,5?", opts: ["3", "5", "7", "9"], ans: 1 },
+    { q: "20. Median of 10,20,30,40,50?", opts: ["20", "25", "30", "40"], ans: 2 },
+    { q: "21. Median of 5 numbers lies at?", opts: ["2nd", "3rd", "4th", "5th"], ans: 1 },
+    { q: "22. Median of a,b?", opts: ["a+b", "(a+b)/2", "a-b", "ab"], ans: 1 },
+    { q: "23. Median affected by extremes?", opts: ["Yes", "No", "Sometimes", "Always"], ans: 1 },
+    { q: "24. Median of equal numbers?", opts: ["0", "Same value", "Undefined", "Largest"], ans: 1 },
+    { q: "25. Median of 11 values?", opts: ["5th", "6th", "7th", "8th"], ans: 1 },
+
+    // Mode Polls
+    { q: "26. Mode is?", opts: ["Average", "Middle", "Most frequent", "Sum"], ans: 2 },
+    { q: "27. Mode of 2,3,3,4?", opts: ["2", "3", "4", "None"], ans: 1 },
+    { q: "28. Mode of 1,2,3,4?", opts: ["1", "2", "3", "No mode"], ans: 3 },
+    { q: "29. Mode of 5,5,5,5?", opts: ["0", "5", "Undefined", "10"], ans: 1 },
+    { q: "30. Data with 2 modes?", opts: ["Unimodal", "Bimodal", "Trimodal", "None"], ans: 1 },
+    { q: "31. Mode useful for?", opts: ["Average", "Popular value", "Spread", "Range"], ans: 1 },
+    { q: "32. Mode of 1,1,2,2,3?", opts: ["1", "2", "Both 1 & 2", "3"], ans: 2 },
+    { q: "33. Mode always exists?", opts: ["Yes", "No", "Sometimes", "Always"], ans: 1 },
+    { q: "34. Mode affected by extremes?", opts: ["Yes", "No", "Sometimes", "Always"], ans: 1 },
+    { q: "35. Mode of 7,7,8,8,9,9?", opts: ["7", "8", "9", "No unique mode"], ans: 3 },
+
+    // SD & Variance Polls
+    { q: "36. Variance measures?", opts: ["Center", "Spread", "Sum", "Count"], ans: 1 },
+    { q: "37. SD is?", opts: ["Square", "√Variance", "Sum", "Mean"], ans: 1 },
+    { q: "38. Same values → variance?", opts: ["1", "0", "∞", "Undefined"], ans: 1 },
+    { q: "39. SD always?", opts: ["Negative", "≥0", "Zero only", "Infinite"], ans: 1 },
+    { q: "40. More spread → SD?", opts: ["Smaller", "Larger", "Zero", "Same"], ans: 1 },
+    { q: "41. SD of identical values?", opts: ["1", "0", "Mean", "Mode"], ans: 1 },
+    { q: "42. Variance uses?", opts: ["Mean differences", "Median", "Mode", "Sum"], ans: 0 },
+    { q: "43. SD unit?", opts: ["Same as data", "Square", "None", "Ratio"], ans: 0 },
+    { q: "44. Variance unit?", opts: ["Same", "Square unit", "None", "Ratio"], ans: 1 },
+    { q: "45. Small SD means?", opts: ["High spread", "Low spread", "Random", "Zero"], ans: 1 },
+    { q: "46. Large SD means?", opts: ["Low spread", "High spread", "Same", "Zero"], ans: 1 },
+    { q: "47. All values same → SD?", opts: ["1", "0", "Mean", "10"], ans: 1 },
+    { q: "48. Variance always?", opts: ["Negative", "≥0", "Infinite", "Undefined"], ans: 1 },
+    { q: "49. SD helps in?", opts: ["Average", "Consistency", "Sorting", "Counting"], ans: 1 },
+    { q: "50. High variance means?", opts: ["Close data", "Spread out", "Same values", "No data"], ans: 1 }
+];
+
+function generateQuiz() {
+    quizData.forEach((item, index) => {
+        let targetDiv = "mean-questions";
+        if (index >= 15 && index < 25) targetDiv = "median-questions";
+        if (index >= 25 && index < 35) targetDiv = "mode-questions";
+        if (index >= 35) targetDiv = "sd-questions";
+
+        const container = document.getElementById(targetDiv);
+        
+        let qHtml = `
+            <div class="question" id="qContainer_${index}">
+                <p>${item.q}</p>
+                <div class="options">
+        `;
+        
+        item.opts.forEach((opt, optIndex) => {
+            qHtml += `
+                <label id="label_${index}_${optIndex}">
+                    <input type="radio" name="q_${index}" value="${optIndex}">
+                    ${opt}
+                </label>
+            `;
+        });
+        
+        qHtml += `</div></div>`;
+        container.innerHTML += qHtml;
+    });
+}
+
+function checkAnswers() {
+    let score = 0;
+    quizData.forEach((item, index) => {
+        // Highlight the correct answer label in green
+        const correctLabel = document.getElementById(`label_${index}_${item.ans}`);
+        correctLabel.classList.add('correct-highlight');
+
+        // Check if user picked it
+        const selected = document.querySelector(`input[name="q_${index}"]:checked`);
+        if (selected && parseInt(selected.value) === item.ans) {
+            score++;
+        }
+    });
+
+    const resultBox = document.getElementById("result");
+    resultBox.style.display = "block";
+    resultBox.style.background = "#e1f5fe";
+    resultBox.style.color = "#0277bd";
+    resultBox.innerHTML = `You completed the quiz! Your Score: ${score} / 50`;
+    
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+generateQuiz();
+</script>
+
+</body>
+</html>
